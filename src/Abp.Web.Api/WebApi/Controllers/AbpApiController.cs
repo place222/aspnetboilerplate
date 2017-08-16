@@ -6,8 +6,10 @@ using Abp.Application.Features;
 using Abp.Authorization;
 using Abp.Configuration;
 using Abp.Domain.Uow;
+using Abp.Events.Bus;
 using Abp.Localization;
 using Abp.Localization.Sources;
+using Abp.ObjectMapping;
 using Abp.Runtime.Session;
 using Castle.Core.Logging;
 
@@ -22,7 +24,12 @@ namespace Abp.WebApi.Controllers
         /// Gets current session information.
         /// </summary>
         public IAbpSession AbpSession { get; set; }
-        
+
+        /// <summary>
+        /// Gets the event bus.
+        /// </summary>
+        public IEventBus EventBus { get; set; }
+
         /// <summary>
         /// Reference to the permission manager.
         /// </summary>
@@ -47,6 +54,11 @@ namespace Abp.WebApi.Controllers
         /// Reference to the permission checker.
         /// </summary>
         public IFeatureChecker FeatureChecker { protected get; set; }
+
+        /// <summary>
+        /// Reference to the object to object mapper.
+        /// </summary>
+        public IObjectMapper ObjectMapper { get; set; }
 
         /// <summary>
         /// Reference to the localization manager.
@@ -88,12 +100,6 @@ namespace Abp.WebApi.Controllers
         public ILogger Logger { get; set; }
 
         /// <summary>
-        /// Gets current session information.
-        /// </summary>
-        [Obsolete("Use AbpSession property instead. CurrentSetting will be removed in future releases.")]
-        protected IAbpSession CurrentSession { get { return AbpSession; } }
-
-        /// <summary>
         /// Reference to <see cref="IUnitOfWorkManager"/>.
         /// </summary>
         public IUnitOfWorkManager UnitOfWorkManager
@@ -125,8 +131,10 @@ namespace Abp.WebApi.Controllers
             Logger = NullLogger.Instance;
             LocalizationManager = NullLocalizationManager.Instance;
             PermissionChecker = NullPermissionChecker.Instance;
+            EventBus = NullEventBus.Instance;
+            ObjectMapper = NullObjectMapper.Instance;
         }
-        
+
         /// <summary>
         /// Gets localized string for given key name and current language.
         /// </summary>
@@ -188,8 +196,7 @@ namespace Abp.WebApi.Controllers
         {
             return PermissionChecker.IsGranted(permissionName);
         }
-
-
+        
         /// <summary>
         /// Checks if given feature is enabled for current tenant.
         /// </summary>

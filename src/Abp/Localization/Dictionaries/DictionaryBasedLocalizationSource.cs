@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Threading;
 using Abp.Configuration.Startup;
 using Abp.Dependency;
 using Abp.Extensions;
+using Castle.Core.Logging;
 
 namespace Abp.Localization.Dictionaries
 {
@@ -18,13 +18,13 @@ namespace Abp.Localization.Dictionaries
         /// <summary>
         /// Unique Name of the source.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public ILocalizationDictionaryProvider DictionaryProvider { get { return _dictionaryProvider; } }
+        public ILocalizationDictionaryProvider DictionaryProvider { get; }
 
         protected ILocalizationConfiguration LocalizationConfiguration { get; private set; }
 
-        private readonly ILocalizationDictionaryProvider _dictionaryProvider;
+        private ILogger _logger;
 
         /// <summary>
         /// 
@@ -33,32 +33,29 @@ namespace Abp.Localization.Dictionaries
         /// <param name="dictionaryProvider"></param>
         public DictionaryBasedLocalizationSource(string name, ILocalizationDictionaryProvider dictionaryProvider)
         {
-            if (name.IsNullOrEmpty())
-            {
-                throw new ArgumentNullException("name");
-            }
+            Check.NotNullOrEmpty(name, nameof(name));
+            Check.NotNull(dictionaryProvider, nameof(dictionaryProvider));
 
             Name = name;
-
-            if (dictionaryProvider == null)
-            {
-                throw new ArgumentNullException("dictionaryProvider");
-            }
-
-            _dictionaryProvider = dictionaryProvider;
+            DictionaryProvider = dictionaryProvider;
         }
 
         /// <inheritdoc/>
         public virtual void Initialize(ILocalizationConfiguration configuration, IIocResolver iocResolver)
         {
             LocalizationConfiguration = configuration;
+
+            _logger = iocResolver.IsRegistered(typeof(ILoggerFactory))
+                ? iocResolver.Resolve<ILoggerFactory>().Create(typeof(DictionaryBasedLocalizationSource))
+                : NullLogger.Instance;
+
             DictionaryProvider.Initialize(Name);
         }
 
         /// <inheritdoc/>
         public string GetString(string name)
         {
-            return GetString(name, Thread.CurrentThread.CurrentUICulture);
+            return GetString(name, CultureInfo.CurrentUICulture);
         }
 
         /// <inheritdoc/>
@@ -68,7 +65,7 @@ namespace Abp.Localization.Dictionaries
 
             if (value == null)
             {
-                return ReturnGivenNameOrThrowException(name);
+                return ReturnGivenNameOrThrowException(name, culture);
             }
 
             return value;
@@ -76,17 +73,17 @@ namespace Abp.Localization.Dictionaries
 
         public string GetStringOrNull(string name, bool tryDefaults = true)
         {
-            return GetStringOrNull(name, Thread.CurrentThread.CurrentUICulture, tryDefaults);
+            return GetStringOrNull(name, CultureInfo.CurrentUICulture, tryDefaults);
         }
 
         public string GetStringOrNull(string name, CultureInfo culture, bool tryDefaults = true)
         {
-            var cultureCode = culture.Name;
+            var cultureName = culture.Name;
             var dictionaries = DictionaryProvider.Dictionaries;
 
             //Try to get from original dictionary (with country code)
             ILocalizationDictionary originalDictionary;
-            if (dictionaries.TryGetValue(cultureCode, out originalDictionary))
+            if (dictionaries.TryGetValue(cultureName, out originalDictionary))
             {
                 var strOriginal = originalDictionary.GetOrNull(name);
                 if (strOriginal != null)
@@ -101,11 +98,10 @@ namespace Abp.Localization.Dictionaries
             }
 
             //Try to get from same language dictionary (without country code)
-            if (cultureCode.Length == 5) //Example: "tr-TR" (length=5)
+            if (cultureName.Contains("-")) //Example: "tr-TR" (length=5)
             {
-                var langCode = cultureCode.Substring(0, 2);
                 ILocalizationDictionary langDictionary;
-                if (dictionaries.TryGetValue(langCode, out langDictionary))
+                if (dictionaries.TryGetValue(GetBaseCultureName(cultureName), out langDictionary))
                 {
                     var strLang = langDictionary.GetOrNull(name);
                     if (strLang != null)
@@ -134,14 +130,14 @@ namespace Abp.Localization.Dictionaries
         /// <inheritdoc/>
         public IReadOnlyList<LocalizedString> GetAllStrings(bool includeDefaults = true)
         {
-            return GetAllStrings(Thread.CurrentThread.CurrentUICulture, includeDefaults);
+            return GetAllStrings(CultureInfo.CurrentUICulture, includeDefaults);
         }
 
         /// <inheritdoc/>
         public IReadOnlyList<LocalizedString> GetAllStrings(CultureInfo culture, bool includeDefaults = true)
         {
             //TODO: Can be optimized (example: if it's already default dictionary, skip overriding)
-            
+
             var dictionaries = DictionaryProvider.Dictionaries;
 
             //Create a temp dictionary to build
@@ -160,10 +156,10 @@ namespace Abp.Localization.Dictionaries
                 }
 
                 //Overwrite all strings from the language based on country culture
-                if (culture.Name.Length == 5)
+                if (culture.Name.Contains("-"))
                 {
                     ILocalizationDictionary langDictionary;
-                    if (dictionaries.TryGetValue(culture.Name.Substring(0, 2), out langDictionary))
+                    if (dictionaries.TryGetValue(GetBaseCultureName(culture.Name), out langDictionary))
                     {
                         foreach (var langString in langDictionary.GetAllStrings())
                         {
@@ -192,25 +188,25 @@ namespace Abp.Localization.Dictionaries
         /// <param name="dictionary">Dictionary to extend the source</param>
         public virtual void Extend(ILocalizationDictionary dictionary)
         {
-            //Add
-            ILocalizationDictionary existingDictionary;
-            if (!DictionaryProvider.Dictionaries.TryGetValue(dictionary.CultureInfo.Name, out existingDictionary))
-            {
-                DictionaryProvider.Dictionaries[dictionary.CultureInfo.Name] = dictionary;
-                return;
-            }
-
-            //Override
-            var localizedStrings = dictionary.GetAllStrings();
-            foreach (var localizedString in localizedStrings)
-            {
-                existingDictionary[localizedString.Name] = localizedString.Value;
-            }
+            DictionaryProvider.Extend(dictionary);
         }
 
-        protected virtual string ReturnGivenNameOrThrowException(string name)
+        protected virtual string ReturnGivenNameOrThrowException(string name, CultureInfo culture)
         {
-            return LocalizationSourceHelper.ReturnGivenNameOrThrowException(LocalizationConfiguration, Name, name);
+            return LocalizationSourceHelper.ReturnGivenNameOrThrowException(
+                LocalizationConfiguration,
+                Name,
+                name,
+                culture,
+                _logger
+            );
+        }
+
+        private static string GetBaseCultureName(string cultureName)
+        {
+            return cultureName.Contains("-")
+                ? cultureName.Left(cultureName.IndexOf("-", StringComparison.Ordinal))
+                : cultureName;
         }
     }
 }

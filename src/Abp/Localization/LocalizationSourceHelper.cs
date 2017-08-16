@@ -1,27 +1,49 @@
-﻿using Abp.Configuration.Startup;
+﻿using System.Globalization;
+using Abp.Configuration.Startup;
+using Abp.Extensions;
 using Abp.Logging;
+using Castle.Core.Logging;
 
 namespace Abp.Localization
 {
     public static class LocalizationSourceHelper
     {
-        public static string ReturnGivenNameOrThrowException(ILocalizationConfiguration configuration, string sourceName, string name)
+        public static string ReturnGivenNameOrThrowException(
+            ILocalizationConfiguration configuration,
+            string sourceName, 
+            string name, 
+            CultureInfo culture,
+            ILogger logger = null)
         {
-            var exceptionMessage = string.Format(
-                "Can not find '{0}' in localization source '{1}'!",
-                name, sourceName
-                );
+            var exceptionMessage = $"Can not find '{name}' in localization source '{sourceName}'!";
 
             if (!configuration.ReturnGivenTextIfNotFound)
             {
                 throw new AbpException(exceptionMessage);
             }
 
-            LogHelper.Logger.Warn(exceptionMessage);
+            if (configuration.LogWarnMessageIfNotFound)
+            {
+                (logger ?? LogHelper.Logger).Warn(exceptionMessage);
+            }
+
+            string notFoundText;
+#if NET46
+            notFoundText = configuration.HumanizeTextIfNotFound
+                ? name.ToSentenceCase(culture)
+                : name;
+#else
+            using (CultureInfoHelper.Use(culture))
+            {
+                notFoundText = configuration.HumanizeTextIfNotFound
+                    ? name.ToSentenceCase()
+                    : name;
+            }
+#endif
 
             return configuration.WrapGivenTextIfNotFound
-                ? string.Format("[{0}]", name)
-                : name;
+                ? $"[{notFoundText}]"
+                : notFoundText;
         }
     }
 }

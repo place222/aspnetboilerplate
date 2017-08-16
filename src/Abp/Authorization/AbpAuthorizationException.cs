@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Abp.Logging;
 
 namespace Abp.Authorization
 {
@@ -7,16 +8,23 @@ namespace Abp.Authorization
     /// This exception is thrown on an unauthorized request.
     /// </summary>
     [Serializable]
-    public class AbpAuthorizationException : AbpException
+    public class AbpAuthorizationException : AbpException, IHasLogSeverity
     {
+        /// <summary>
+        /// Severity of the exception.
+        /// Default: Warn.
+        /// </summary>
+        public LogSeverity Severity { get; set; }
+
         /// <summary>
         /// Creates a new <see cref="AbpAuthorizationException"/> object.
         /// </summary>
         public AbpAuthorizationException()
         {
-
+            Severity = LogSeverity.Warn;
         }
 
+#if NET46
         /// <summary>
         /// Creates a new <see cref="AbpAuthorizationException"/> object.
         /// </summary>
@@ -25,6 +33,7 @@ namespace Abp.Authorization
         {
 
         }
+#endif
 
         /// <summary>
         /// Creates a new <see cref="AbpAuthorizationException"/> object.
@@ -33,7 +42,7 @@ namespace Abp.Authorization
         public AbpAuthorizationException(string message)
             : base(message)
         {
-
+            Severity = LogSeverity.Warn;
         }
 
         /// <summary>
@@ -44,7 +53,7 @@ namespace Abp.Authorization
         public AbpAuthorizationException(string message, Exception innerException)
             : base(message, innerException)
         {
-
+            Severity = LogSeverity.Warn;
         }
     }
 }

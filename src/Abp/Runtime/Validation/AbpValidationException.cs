@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Abp.Logging;
 
 namespace Abp.Runtime.Validation
 {
@@ -9,12 +10,18 @@ namespace Abp.Runtime.Validation
     /// This exception type is used to throws validation exceptions.
     /// </summary>
     [Serializable]
-    public class AbpValidationException : AbpException
+    public class AbpValidationException : AbpException, IHasLogSeverity
     {
         /// <summary>
         /// Detailed list of validation errors for this exception.
         /// </summary>
-        public List<ValidationResult> ValidationErrors { get; set; }
+        public IList<ValidationResult> ValidationErrors { get; set; }
+
+        /// <summary>
+        /// Exception severity.
+        /// Default: Warn.
+        /// </summary>
+        public LogSeverity Severity { get; set; }
 
         /// <summary>
         /// Constructor.
@@ -22,8 +29,10 @@ namespace Abp.Runtime.Validation
         public AbpValidationException()
         {
             ValidationErrors = new List<ValidationResult>();
+            Severity = LogSeverity.Warn;
         }
 
+#if NET46
         /// <summary>
         /// Constructor for serializing.
         /// </summary>
@@ -31,7 +40,9 @@ namespace Abp.Runtime.Validation
             : base(serializationInfo, context)
         {
             ValidationErrors = new List<ValidationResult>();
+            Severity = LogSeverity.Warn;
         }
+#endif
 
         /// <summary>
         /// Constructor.
@@ -41,6 +52,7 @@ namespace Abp.Runtime.Validation
             : base(message)
         {
             ValidationErrors = new List<ValidationResult>();
+            Severity = LogSeverity.Warn;
         }
 
 
@@ -49,10 +61,11 @@ namespace Abp.Runtime.Validation
         /// </summary>
         /// <param name="message">Exception message</param>
         /// <param name="validationErrors">Validation errors</param>
-        public AbpValidationException(string message, List<ValidationResult> validationErrors)
+        public AbpValidationException(string message, IList<ValidationResult> validationErrors)
             : base(message)
         {
             ValidationErrors = validationErrors;
+            Severity = LogSeverity.Warn;
         }
 
         /// <summary>
@@ -64,6 +77,7 @@ namespace Abp.Runtime.Validation
             : base(message, innerException)
         {
             ValidationErrors = new List<ValidationResult>();
+            Severity = LogSeverity.Warn;
         }
     }
 }

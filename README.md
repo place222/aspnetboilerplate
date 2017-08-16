@@ -1,67 +1,87 @@
+# ASP.NET Boilerplate
 
-ASP.NET Boilerplate
-===================
+AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/tvad583r9lbimxh4?svg=true)](https://ci.appveyor.com/project/hikalkan/aspnetboilerplate)
 
-What is ABP?
-------------
+## What is ABP?
 
-ASP.NET Boilerplate is a starting point for new modern web applications using best practices and most popular tools. It's aimed to be a __SOLID__ model, a general-purpose __application framework__ and a project __template__.
+ASP.NET Boilerplate is a general purpose **application framework** especially designed for new modern web applications. It uses already **familiar tools** and implements **best practices** arround them to provide you a **SOLID development experience**.
 
-### Framework
+###### Modular Design
 
-ASP.NET Boilerplate is an application framework built on latest __ASP.NET MVC__ & __Web API__ technologies. It makes easy to use dependency injection, logging, validation, exception handling, localization and so on. It makes these not only itself but also using most popular framework and libraries.
+Designed as <a href="https://aspnetboilerplate.com/Pages/Documents/Module-System" target="_blank">**modular**</a> and **extensible**. Provides infrastructure to build your own modules too.
 
-### Architecture
+###### Multi Tenancy
 
-ASP.NET Boilerplate implements __NLayer architecture__ (Domain, Application, Infrastructure and Presentation Layers) and __Domain Driven Design__ (Entities, Repositories, Domain/Application Services, DTO's...). Also implements and provides a good infrastructure to implement __best practices__ such as __Dependency Injection__.
+**SaaS** applications made easy! Integrated <a href="https://aspnetboilerplate.com/Pages/Documents/Multi-Tenancy" target="_blank">multi-tenancy</a> from database to UI.
 
-### Template
+###### Well Documented
 
-ASP.NET Boilerplate easily creates startup template for your project. It includes most used framework and libraries by default. Also allows you to choice __Single-Page__ (SPA: Angularjs or Durandaljs) or __Multi-Page__ (MVC) architecture, EntityFramework or NHibernate as ORM.
+Compherensive <a href="https://aspnetboilerplate.com/Pages/Documents" target="_blank">**documentation**</a> and jump start tutorials.
 
-Features
---------
+## How It Works
 
-### Framework
+Don't Repeat Yourself! ASP.NET Boilerplate automates common software development tasks by convention. You focus your business code.
 
-These are some key features of the framework itself:
+![ASP.NET Boilerplate](doc/img/abp-concerns.png)
 
-- Modular and NLayered architecture
-- Multi-tenancy
-- Dependency Injection
-- Domain Driven Design
-- Unit of work implementation
-- Flexible Localization system
-- Automatic data filters
-- Audit logging
-- Setting management
-- Menu management
-- Authorization
-- Exception handling
-- Validation
-- Logging
-- Event bus for domain events
-- Auto-creating Web API layer for Application Services
-- Auto-creating Javascript proxy layer to use Web API layer
-- Javascript helper methods for ajax, notifications, message boxes, making UI busy...
-- Easily working with embedded resources
-- Useful extension and helper methods
+See <a href="https://aspnetboilerplate.com/Pages/Documents/Introduction" target="_blank">introduction</a> document for details.
 
-### Module-Zero
+## Layered Architecture
 
-Module-Zero is the module that implements abstract concepts of the framework, also adds some useful stuff for enterprise web applications:
+ABP provides a layered architectural model based on **Domain Driven Design**. Provides a **SOLID** model for your application.
 
-- Multi-tenancy
-- Role management
-- User management
-- Session management
-- Setting management
-- Audit logging
+![NLayer Architecture](doc/img/abp-nlayer-architecture.png)
 
-See https://github.com/aspnetboilerplate/module-zero for more
+See <a href="https://aspnetboilerplate.com/Pages/Documents/NLayer-Architecture" target="_blank">NLayer Architecture</a> document for details.
 
-Links
------
+## Startup Templates
 
-* Web site: http://www.aspnetboilerplate.com
-* Forum: http://forum.aspnetboilerplate.com
+Create your solution based on free or premium startup templates. Either with an Angular Single-Page Application or Classic MVC & jQuery architecture.
+
+![](doc/img/module-zero-core-template.png)
+
+<a href="https://aspnetboilerplate.com/Templates" target="_blank">Create your project now!</a>
+
+## Nuget Packages
+
+ASP.NET Boilerplate is distributed as nuget packages.
+
+|Package|Status|
+|:------|:-----:|
+|Abp|[![NuGet version](https://badge.fury.io/nu/Abp.svg)](https://badge.fury.io/nu/Abp)|
+|Abp.AspNetCore|[![NuGet version](https://badge.fury.io/nu/Abp.AspNetCore.svg)](https://badge.fury.io/nu/Abp.AspNetCore)|
+|Abp.Web.Common|[![NuGet version](https://badge.fury.io/nu/Abp.Web.Common.svg)](https://badge.fury.io/nu/Abp.Web.Common)|
+|Abp.Web|[![NuGet version](https://badge.fury.io/nu/Abp.Web.svg)](https://badge.fury.io/nu/Abp.Web)|
+|Abp.Web.Mvc|[![NuGet version](https://badge.fury.io/nu/Abp.Web.Mvc.svg)](https://badge.fury.io/nu/Abp.Web.Mvc)|
+|Abp.Web.Api|[![NuGet version](https://badge.fury.io/nu/Abp.Web.Api.svg)](https://badge.fury.io/nu/Abp.Web.Api)|
+|Abp.Web.Api.OData|[![NuGet version](https://badge.fury.io/nu/Abp.eb.Api.OData.svg)](https://badge.fury.io/nu/Abp.Web.Api.OData)|
+|Abp.Web.Resources|[![NuGet version](https://badge.fury.io/nu/Abp.Web.Resources.svg)](https://badge.fury.io/nu/Abp.Web.Resources)|
+|Abp.Web.SignalR|[![NuGet version](https://badge.fury.io/nu/Abp.Web.SignalR.svg)](https://badge.fury.io/nu/Abp.Web.SignalR)|
+|Abp.Owin|[![NuGet version](https://badge.fury.io/nu/Abp.Owin.svg)](https://badge.fury.io/nu/Abp.Owin)|
+|Abp.EntityFramework.Common|[![NuGet version](https://badge.fury.io/nu/Abp.EntityFramework.Common.svg)](https://badge.fury.io/nu/Abp.EntityFramework.Common)|
+|Abp.EntityFramework|[![NuGet version](https://badge.fury.io/nu/Abp.EntityFramework.svg)](https://badge.fury.io/nu/Abp.EntityFramework)|
+|Abp.EntityFramework.GraphDiff|[![NuGet version](https://badge.fury.io/nu/Abp.EntityFramework.GraphDiff.svg)](https://badge.fury.io/nu/Abp.EntityFramework.GraphDiff)|
+|Abp.EntityFrameworkCore|[![NuGet version](https://badge.fury.io/nu/Abp.EntityFrameworkCore.svg)](https://badge.fury.io/nu/Abp.EntityFrameworkCore)|
+|Abp.NHibernate|[![NuGet version](https://badge.fury.io/nu/Abp.NHibernate.svg)](https://badge.fury.io/nu/Abp.NHibernate)|
+|Abp.Dapper|[![NuGet version](https://badge.fury.io/nu/Abp.Dapper.svg)](https://badge.fury.io/nu/Abp.Dapper)|
+|Abp.FluentMigrator|[![NuGet version](https://badge.fury.io/nu/Abp.FluentMigrator.svg)](https://badge.fury.io/nu/Abp.FluentMigrator)|
+|Abp.AspNetCore|[![NuGet version](https://badge.fury.io/nu/Abp.AspNetCore.svg)](https://badge.fury.io/nu/Abp.AspNetCore)|
+|Abp.AutoMapper|[![NuGet version](https://badge.fury.io/nu/Abp.AutoMapper.svg)](https://badge.fury.io/nu/Abp.AutoMapper)|
+|Abp.HangFire|[![NuGet version](https://badge.fury.io/nu/Abp.HangFire.svg)](https://badge.fury.io/nu/Abp.HangFire)|
+|Abp.HangFire.AspNetCore|[![NuGet version](https://badge.fury.io/nu/Abp.HangFire.AspNetCore.svg)](https://badge.fury.io/nu/Abp.HangFire.AspNetCore)|
+|Abp.Castle.Log4Net|[![NuGet version](https://badge.fury.io/nu/Abp.Castle.Log4Net.svg)](https://badge.fury.io/nu/Abp.Castle.Log4Net)|
+|Abp.RedisCache|[![NuGet version](https://badge.fury.io/nu/Abp.RedisCache.svg)](https://badge.fury.io/nu/Abp.RedisCache)|
+|Abp.RedisCache.ProtoBuf|[![NuGet version](https://badge.fury.io/nu/Abp.RedisCache.ProtoBuf.svg)](https://badge.fury.io/nu/Abp.RedisCache.ProtoBuf)|
+|Abp.MailKit|[![NuGet version](https://badge.fury.io/nu/Abp.MailKit.svg)](https://badge.fury.io/nu/Abp.MailKit)|
+|Abp.Quartz|[![NuGet version](https://badge.fury.io/nu/Abp.Quartz.svg)](https://badge.fury.io/nu/Abp.Quartz)|
+|Abp.TestBase|[![NuGet version](https://badge.fury.io/nu/Abp.TestBase.svg)](https://badge.fury.io/nu/Abp.TestBase)|
+|Abp.AspNetCore.TestBase|[![NuGet version](https://badge.fury.io/nu/Abp.AspNetCore.TestBase.svg)](https://badge.fury.io/nu/Abp.AspNetCore.TestBase)|
+
+## Links
+
+* Web site & Documentation: https://aspnetboilerplate.com
+* Questions & Answers: https://stackoverflow.com/questions/tagged/aspnetboilerplate?sort=newest
+
+## License
+
+[MIT](LICENSE).

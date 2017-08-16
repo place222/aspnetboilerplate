@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Abp.Extensions;
 
 namespace Abp.Localization
 {
@@ -6,9 +7,14 @@ namespace Abp.Localization
     {
         public static bool IsValidCultureCode(string cultureCode)
         {
+            if (cultureCode.IsNullOrWhiteSpace())
+            {
+                return false;
+            }
+
             try
             {
-                CultureInfo.GetCultureInfo(cultureCode);
+                CultureInfoHelper.Get(cultureCode);
                 return true;
             }
             catch (CultureNotFoundException)

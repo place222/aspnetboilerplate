@@ -1,10 +1,13 @@
+using System;
+#if NET46
 using System.Net.Mail;
+#endif
 using System.Threading.Tasks;
 using Castle.Core.Logging;
+using Abp.Threading;
 
 namespace Abp.Net.Mail
 {
-    //TODO: Move this to Abp.TestBase?
     /// <summary>
     /// This class is an implementation of <see cref="IEmailSender"/> as similar to null pattern.
     /// It does not send emails but logs them.
@@ -23,8 +26,10 @@ namespace Abp.Net.Mail
             Logger = NullLogger.Instance;
         }
 
+#if NET46
         protected override Task SendEmailAsync(MailMessage mail)
         {
+            Logger.Warn("USING NullEmailSender!");
             Logger.Debug("SendEmailAsync:");
             LogEmail(mail);
             return Task.FromResult(0);
@@ -32,6 +37,7 @@ namespace Abp.Net.Mail
 
         protected override void SendEmail(MailMessage mail)
         {
+            Logger.Warn("USING NullEmailSender!");
             Logger.Debug("SendEmail:");
             LogEmail(mail);
         }
@@ -43,5 +49,21 @@ namespace Abp.Net.Mail
             Logger.Debug(mail.Subject);
             Logger.Debug(mail.Body);
         }
+#else
+        public override Task SendAsync(string from, string to, string subject, string body, bool isBodyHtml = true)
+        {
+            Send(from, to, subject, body, isBodyHtml);
+            return AbpTaskCache.CompletedTask;
+        }
+
+        public override void Send(string from, string to, string subject, string body, bool isBodyHtml = true)
+        {
+            Logger.Debug("from       : " + from);
+            Logger.Debug("to         : " + to);
+            Logger.Debug("subject    : " + subject);
+            Logger.Debug("body       : " + body);
+            Logger.Debug("isBodyHtml : " + isBodyHtml.ToString());
+        }
+#endif
     }
 }

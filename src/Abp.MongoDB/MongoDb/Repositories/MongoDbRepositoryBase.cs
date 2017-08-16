@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Domain.Repositories;
 using MongoDB.Driver;
@@ -31,20 +27,20 @@ namespace Abp.MongoDb.Repositories
     public class MongoDbRepositoryBase<TEntity, TPrimaryKey> : AbpRepositoryBase<TEntity, TPrimaryKey>
         where TEntity : class, IEntity<TPrimaryKey>
     {
-        private readonly IMongoDatabaseProvider _databaseProvider;
-
-        protected MongoDatabase Database
+        public virtual MongoDatabase Database
         {
             get { return _databaseProvider.Database; }
         }
 
-        protected MongoCollection<TEntity> Collection
+        public virtual MongoCollection<TEntity> Collection
         {
             get
             {
                 return _databaseProvider.Database.GetCollection<TEntity>(typeof(TEntity).Name);
             }
         }
+
+        private readonly IMongoDatabaseProvider _databaseProvider;
 
         public MongoDbRepositoryBase(IMongoDatabaseProvider databaseProvider)
         {
@@ -59,13 +55,19 @@ namespace Abp.MongoDb.Repositories
         public override TEntity Get(TPrimaryKey id)
         {
             var query = MongoDB.Driver.Builders.Query<TEntity>.EQ(e => e.Id, id);
-            return Collection.FindOne(query); //TODO: What if no entity with id?
+            var entity = Collection.FindOne(query);
+            if (entity == null)
+            {
+                throw new EntityNotFoundException("There is no such an entity with given primary key. Entity type: " + typeof(TEntity).FullName + ", primary key: " + id);
+            }
+
+            return entity;
         }
 
         public override TEntity FirstOrDefault(TPrimaryKey id)
         {
             var query = MongoDB.Driver.Builders.Query<TEntity>.EQ(e => e.Id, id);
-            return Collection.FindOne(query); //TODO: What if no entity with id?
+            return Collection.FindOne(query);
         }
 
         public override TEntity Insert(TEntity entity)

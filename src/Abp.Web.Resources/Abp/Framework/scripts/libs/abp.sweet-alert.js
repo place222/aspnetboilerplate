@@ -45,7 +45,7 @@
 
         var opts = $.extend(
             {},
-            abp.libs.sweetAlert.config.default,
+            abp.libs.sweetAlert.config['default'],
             abp.libs.sweetAlert.config[type],
             {
                 title: title,
@@ -89,7 +89,7 @@
 
         var opts = $.extend(
             {},
-            abp.libs.sweetAlert.config.default,
+            abp.libs.sweetAlert.config['default'],
             abp.libs.sweetAlert.config.confirm,
             userOpts
         );
@@ -97,7 +97,7 @@
         return $.Deferred(function ($dfd) {
             sweetAlert(opts, function (isConfirmed) {
                 callback && callback(isConfirmed);
-                $dfd.resolve();
+                $dfd.resolve(isConfirmed);
             });
         });
     };

@@ -1,14 +1,14 @@
 using System;
 using System.Runtime.Serialization;
+using Abp.Logging;
 
 namespace Abp.UI
 {
     /// <summary>
     /// This exception type is directly shown to the user.
-    /// TODO: Move to Abp namespace
     /// </summary>
     [Serializable]
-    public class UserFriendlyException : AbpException
+    public class UserFriendlyException : AbpException, IHasLogSeverity, IHasErrorCode
     {
         /// <summary>
         /// Additional information about the exception.
@@ -16,13 +16,25 @@ namespace Abp.UI
         public string Details { get; private set; }
 
         /// <summary>
+        /// An arbitrary error code.
+        /// </summary>
+        public int Code { get; set; }
+
+        /// <summary>
+        /// Severity of the exception.
+        /// Default: Warn.
+        /// </summary>
+        public LogSeverity Severity { get; set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public UserFriendlyException()
         {
-
+            Severity = LogSeverity.Warn;
         }
 
+#if NET46
         /// <summary>
         /// Constructor for serializing.
         /// </summary>
@@ -31,6 +43,7 @@ namespace Abp.UI
         {
 
         }
+#endif
 
         /// <summary>
         /// Constructor.
@@ -39,7 +52,29 @@ namespace Abp.UI
         public UserFriendlyException(string message)
             : base(message)
         {
+            Severity = LogSeverity.Warn;
+        }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="message">Exception message</param>
+        /// <param name="severity">Exception severity</param>
+        public UserFriendlyException(string message, LogSeverity severity)
+            : base(message)
+        {
+            Severity = severity;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="code">Error code</param>
+        /// <param name="message">Exception message</param>
+        public UserFriendlyException(int code, string message)
+            : this(message)
+        {
+            Code = code;
         }
 
         /// <summary>
@@ -48,9 +83,21 @@ namespace Abp.UI
         /// <param name="message">Exception message</param>
         /// <param name="details">Additional information about the exception</param>
         public UserFriendlyException(string message, string details)
-            : base(message)
+            : this(message)
         {
             Details = details;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="code">Error code</param>
+        /// <param name="message">Exception message</param>
+        /// <param name="details">Additional information about the exception</param>
+        public UserFriendlyException(int code, string message, string details)
+            : this(message, details)
+        {
+            Code = code;
         }
 
         /// <summary>
@@ -61,7 +108,7 @@ namespace Abp.UI
         public UserFriendlyException(string message, Exception innerException)
             : base(message, innerException)
         {
-
+            Severity = LogSeverity.Warn;
         }
 
         /// <summary>
@@ -71,7 +118,7 @@ namespace Abp.UI
         /// <param name="details">Additional information about the exception</param>
         /// <param name="innerException">Inner exception</param>
         public UserFriendlyException(string message, string details, Exception innerException)
-            : base(message, innerException)
+            : this(message, innerException)
         {
             Details = details;
         }

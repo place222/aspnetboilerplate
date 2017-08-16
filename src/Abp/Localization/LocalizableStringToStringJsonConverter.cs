@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Newtonsoft.Json;
 
 namespace Abp.Localization
@@ -18,7 +19,7 @@ namespace Abp.Localization
             }
 
             var localizableString = (ILocalizableString) value;
-            writer.WriteValue(localizableString.Localize());
+            writer.WriteValue(localizableString.Localize(new LocalizationContext(LocalizationHelper.Manager)));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -28,7 +29,7 @@ namespace Abp.Localization
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof (ILocalizableString).IsAssignableFrom(objectType);
+            return typeof (ILocalizableString).GetTypeInfo().IsAssignableFrom(objectType);
         }
     }
 }
